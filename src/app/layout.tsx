@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from './_global/outlines/Header'
 import Footer from './_global/outlines/Footer'
+import StyledComponentsRegistry from './registry'
 
 export const metadata: Metadata = {
   title: '게시판',
@@ -16,10 +17,12 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <Header />
-        {children}
-        <Footer />
-        </body>
+        <StyledComponentsRegistry>
+          <Header />
+          <main className="main-content">{children}</main>
+          <Footer />
+        </StyledComponentsRegistry>
+      </body>
     </html>
   )
 }
