@@ -1,29 +1,37 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import './globals.css'
 import Header from './_global/outlines/Header'
 import Footer from './_global/outlines/Footer'
 import StyledComponentsRegistry from './registry'
 import { getLoggedMember } from './member/_services/actions'
+import { UserProvider } from './_global/contexts/UserContext'
 
 export const metadata: Metadata = {
   title: '게시판',
   description: '(게시판 설명 들어올 곳)',
 }
 
-export default  async function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   const member = await getLoggedMember()
-  console.log('member:', member)
+  if (!member) {
+    // 토큰이 만료 되었거나 형식에 문제가 있는 경우 - 토큰을 쿠키에서 제거
+    const cookie = await cookies()
+    cookie.delete('token')
+  }
   return (
     <html lang="ko">
       <body>
         <StyledComponentsRegistry>
-          <Header />
-          <main className="main-content">{children}</main>
-          <Footer />
+          <UserProvider loggedMember={member}>
+            <Header />
+            <main className="main-content">{children}</main>
+            <Footer />
+          </UserProvider>
         </StyledComponentsRegistry>
       </body>
     </html>
