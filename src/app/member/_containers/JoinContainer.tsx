@@ -27,7 +27,7 @@ const JoinContainer = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }, [])
 
-  const onToggle = useCallback((e) => {
+  const onToggle = useCallback(() => {
     setForm((prev) => ({ ...prev, termsAgree: !prev.termsAgree }))
   }, [])
 
