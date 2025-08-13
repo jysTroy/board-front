@@ -1,3 +1,5 @@
+import DetectContainer from './detect/_containers/DetectContainer'
+
 export default function MainPage() {
-  return <h1>메인페이지</h1>
+  return <DetectContainer />
 }
