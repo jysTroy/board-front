@@ -20,8 +20,6 @@ export default async function RootLayout({
   const member = await getLoggedMember()
   if (!member) {
     // 토큰이 만료 되었거나 형식에 문제가 있는 경우 - 토큰을 쿠키에서 제거
-    const cookie = await cookies()
-    cookie.delete('token')
   }
   return (
     <html lang="ko">
