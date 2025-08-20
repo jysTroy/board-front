@@ -7,19 +7,22 @@ import LoginForm from '../_components/LoginForm'
 type FormType = {
   email: string
   password: string
-  redirecturl?: string
+  redirectUrl?: string
 }
 
-const LoginContainer = () => {
+const LoginContainer = ({ redirectUrl }) => {
   const [errors, action, pending] = useActionState<any, any>(processLogin, {})
   const [form, setForm] = useState<FormType>({
     email: '',
     password: '',
+    redirectUrl: redirectUrl ?? '',
   })
 
   const searchParams = useSearchParams()
   useEffect(() => {
-    const redirectUrl = searchParams.get('redirectUrl')?.toString
+    const redirectUrl = searchParams.get('redirectUrl')?.toString()
+    if (!redirectUrl) return
+
     setForm((prev) => ({ ...prev, redirectUrl }))
   }, [searchParams])
 

@@ -1,6 +1,8 @@
 'use server'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { revalidateTag } from 'next/cache'
+
 /**
  * 회원가입 처리
  *
@@ -94,10 +96,9 @@ export async function processLogin(errors, formData: FormData) {
     email: formData.get('email')?.toString(),
     password: formData.get('password')?.toString(),
   }
-
   // 유효성 검사 S
   if (!params.email || !params.email.trim()) {
-    errors.email = '이메일을 입력하세요'
+    errors.email = '이메일을 입력하세요.'
     hasErrors = true
   }
 
@@ -107,7 +108,11 @@ export async function processLogin(errors, formData: FormData) {
   }
   // 유효성 검사 E
 
-  // API 백엔드로 요청을 보냄
+  if (hasErrors) {
+    return errors
+  }
+
+  // API 백앤드로 요청을 보냄
   const apiUrl = `${process.env.API_URL}/member/token`
   const res = await fetch(apiUrl, {
     method: 'POST',
@@ -126,41 +131,44 @@ export async function processLogin(errors, formData: FormData) {
       httpOnly: true,
       path: '/',
     })
+
+    revalidateTag('loggedMember')
   } else {
     // 로그인 실패
     const json = await res.json()
     return json.messages.global ? json.messages : { global: json.messages }
   }
 
-  // 로그인 성공 시 페이지 이동 - redirectUrl이 있다면 그 주소로 이동 아니면 메인페이지(/)로 이동
-  const redirectUrl = formData.get('redirectUrl')?.toString() ?? '/'
+  // 로그인 성공시 페이지 이동 - redurectUrl이 있다면 그 주소로 이동 아니면 메인페이지(/)로 이동
+  const redirectUrl = formData.get('redirectUrl')?.toString()
 
   redirect(redirectUrl ? redirectUrl : '/')
 }
 
 /**
  * 로그인한 회원 정보를 조회
- *  - 요청 헤더 Authorization: bearer 토큰
+ *   - 요청 헤더 Authorization: Bearer 토큰
  */
 export async function getLoggedMember() {
   try {
     const cookie = await cookies()
-    const token = cookie.get('token')
+    const token = cookie.get('token')?.value
     if (!token) return
 
     const apiUrl = `${process.env.API_URL}/member`
     const res = await fetch(apiUrl, {
       method: 'GET',
       headers: {
-        Authorization: `bearer ${token}`,
+        Authorization: `Bearer ${token}`,
+      },
+      next: {
+        tags: ['loggedMember'],
       },
     })
 
-    if (res.status !== 200) {
-      return
+    if (res.status === 200) {
+      return await res.json()
     }
-
-    return await res.json()
   } catch (err) {
     console.log('getLoggedMember() error:', err)
   }

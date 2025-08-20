@@ -17,7 +17,7 @@ const LoginForm = ({ errors, action, pending, form, onChange }) => {
       <Input
         type="text"
         name="email"
-        placeholder="이메일을 입력하세요"
+        placeholder="이메일을 입력하세요."
         value={form.email}
         onChange={onChange}
       />
@@ -26,11 +26,12 @@ const LoginForm = ({ errors, action, pending, form, onChange }) => {
       <Input
         type="password"
         name="password"
-        placeholder="비밀번호를 입력하세요"
+        placeholder="비밀번호를 입력하세요."
         value={form.password}
         onChange={onChange}
       />
       <MessageBox color="danger">{errors?.password}</MessageBox>
+
       <SubmitButton type="submit" disabled={pending}>
         로그인
       </SubmitButton>
